@@ -52,7 +52,7 @@ function mockResponse(body: unknown, status = 200): Response {
 
 beforeEach(() => {
   clearGitHubApiCacheForTests();
-  process.env.GITHUB_PAT = 'test-token';
+  process.env.GITHUB_PAT = 'ghp_testtokenAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
   delete process.env.GITHUB_TOKEN;
 });
 
@@ -177,7 +177,7 @@ describe('fetchGitHubContributions', () => {
     expect(url).toBe('https://api.github.com/graphql');
     expect(options?.method).toBe('POST');
     expect(options?.headers).toMatchObject({
-      Authorization: 'bearer test-token',
+      Authorization: 'bearer ghp_testtokenAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       'Content-Type': 'application/json',
     });
 
@@ -188,7 +188,7 @@ describe('fetchGitHubContributions', () => {
 
   it('uses GITHUB_TOKEN when GITHUB_PAT is not configured', async () => {
     delete process.env.GITHUB_PAT;
-    process.env.GITHUB_TOKEN = 'actions-token';
+    process.env.GITHUB_TOKEN = 'ghp_actionstokenAAAAAAAAAAAAAAAAAAAAAAAA';
     vi.mocked(fetch).mockResolvedValue(
       mockResponse({
         data: {
@@ -206,7 +206,7 @@ describe('fetchGitHubContributions', () => {
 
     const [, options] = vi.mocked(fetch).mock.calls[0];
     expect(options?.headers).toMatchObject({
-      Authorization: 'bearer actions-token',
+      Authorization: 'bearer ghp_actionstokenAAAAAAAAAAAAAAAAAAAAAAAA',
     });
   });
 

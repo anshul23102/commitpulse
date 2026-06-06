@@ -7,6 +7,12 @@ import {
   getGlobalCircuitBreakerOpenUntilForTests,
 } from './github';
 
+const MOCK_TOKEN_1 = 'ghp_token1AAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const MOCK_TOKEN_2 = 'ghp_token2AAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const MOCK_TOKEN_3 = 'ghp_token3AAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const MOCK_BAD_TOKEN = 'ghp_badtokenAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const MOCK_GOOD_TOKEN = 'ghp_goodtokenAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+
 describe('GitHub Multi-Token Rotation & Fallback', () => {
   const originalGitHubPat = process.env.GITHUB_PAT;
   const originalGitHubToken = process.env.GITHUB_TOKEN;
@@ -25,15 +31,15 @@ describe('GitHub Multi-Token Rotation & Fallback', () => {
   });
 
   it('correctly parses multiple comma-separated tokens', () => {
-    process.env.GITHUB_PAT = ' token1, token2,  token3 ';
+    process.env.GITHUB_PAT = ` ${MOCK_TOKEN_1}, ${MOCK_TOKEN_2},  ${MOCK_TOKEN_3} `;
     delete process.env.GITHUB_TOKEN;
 
     const tokens = getGitHubTokens();
-    expect(tokens).toEqual(['token1', 'token2', 'token3']);
+    expect(tokens).toEqual([MOCK_TOKEN_1, MOCK_TOKEN_2, MOCK_TOKEN_3]);
   });
 
   it('rotates to the next token on HTTP 429 rate limiting', async () => {
-    process.env.GITHUB_PAT = 'token1,token2';
+    process.env.GITHUB_PAT = `${MOCK_TOKEN_1},${MOCK_TOKEN_2}`;
     delete process.env.GITHUB_TOKEN;
 
     fetchMock.mockResolvedValueOnce({
@@ -60,14 +66,14 @@ describe('GitHub Multi-Token Rotation & Fallback', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
     const firstCallHeaders = fetchMock.mock.calls[0][1].headers;
-    expect(firstCallHeaders.Authorization).toBe('bearer token1');
+    expect(firstCallHeaders.Authorization).toBe(`bearer ${MOCK_TOKEN_1}`);
 
     const secondCallHeaders = fetchMock.mock.calls[1][1].headers;
-    expect(secondCallHeaders.Authorization).toBe('bearer token2');
+    expect(secondCallHeaders.Authorization).toBe(`bearer ${MOCK_TOKEN_2}`);
   });
 
   it('rotates to the next token on HTTP 401 unauthorized and excludes the bad token for 24h', async () => {
-    process.env.GITHUB_PAT = 'bad_token,good_token';
+    process.env.GITHUB_PAT = `${MOCK_BAD_TOKEN},${MOCK_GOOD_TOKEN}`;
     delete process.env.GITHUB_TOKEN;
 
     fetchMock.mockResolvedValueOnce({
@@ -104,7 +110,7 @@ describe('GitHub Multi-Token Rotation & Fallback', () => {
     });
     expect(res2.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(fetchMock.mock.calls[2][1].headers.Authorization).toBe('bearer good_token');
+    expect(fetchMock.mock.calls[2][1].headers.Authorization).toBe(`bearer ${MOCK_GOOD_TOKEN}`);
   });
 
   it('prioritizes token with highest remaining quota', async () => {
