@@ -45,7 +45,6 @@ export function getGlobalCircuitBreakerOpenUntilForTests() {
   return globalCircuitBreakerOpenUntil;
 }
 
-//Explicit, strongly-typed Error subclass
 export class RateLimitError extends Error {
   constructor(
     message: string,
@@ -56,15 +55,24 @@ export class RateLimitError extends Error {
   }
 }
 
-// Global circuit state tracking
 let globalCircuitBreakerOpenUntil = 0;
 
+function isValidGitHubTokenFormat(token: string): boolean {
+  return (
+    token.length >= 36 &&
+    (token.startsWith('ghp_') ||
+      token.startsWith('ghu_') ||
+      token.startsWith('ghs_') ||
+      token.startsWith('ghr_') ||
+      token.startsWith('github_pat_'))
+  );
+}
 export function getGitHubTokens(): string[] {
   const envToken = process.env.GITHUB_PAT || process.env.GITHUB_TOKEN || '';
   return envToken
     .split(',')
     .map((t) => t.trim())
-    .filter((t) => t !== '');
+    .filter((t) => t !== '' && isValidGitHubTokenFormat(t));
 }
 
 function isAbortError(error: unknown): boolean {
