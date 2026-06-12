@@ -95,8 +95,8 @@ describe('GitHub Multi-Token Rotation & Fallback', () => {
 
     expect(res.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe('bearer bad_token');
-    expect(fetchMock.mock.calls[1][1].headers.Authorization).toBe('bearer good_token');
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe(`bearer ${MOCK_BAD_TOKEN}`);
+    expect(fetchMock.mock.calls[1][1].headers.Authorization).toBe(`bearer ${MOCK_GOOD_TOKEN}`);
 
     fetchMock.mockResolvedValueOnce({
       status: 200,
