@@ -212,7 +212,7 @@ describe('fetchGitHubContributions', () => {
 
   it('verifies Authorization header uses GITHUB_TOKEN value in fallback path', async () => {
     delete process.env.GITHUB_PAT;
-    process.env.GITHUB_TOKEN = 'my-actions-token';
+    process.env.GITHUB_TOKEN = 'ghp_fallbacktokenAAAAAAAAAAAAAAAAAAAAAAAA';
     vi.mocked(fetch).mockResolvedValue(
       mockResponse({
         data: {
@@ -230,7 +230,7 @@ describe('fetchGitHubContributions', () => {
 
     const [, options] = vi.mocked(fetch).mock.calls[0];
     expect(options?.headers).toMatchObject({
-      Authorization: 'bearer my-actions-token',
+      Authorization: 'bearer ghp_fallbacktokenAAAAAAAAAAAAAAAAAAAAAAAA',
     });
   });
 
