@@ -29,8 +29,8 @@ interface GitHubRepo {
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 500;
 const MAX_RETRY_DELAY_MS = 5000;
-const GRAPHQL_TIMEOUT_MS = 8000; // 8s for GraphQL endpoint
-const REST_TIMEOUT_MS = 5000; // 5s for REST endpoints
+const GRAPHQL_TIMEOUT_MS = parseInt(process.env.GITHUB_GRAPHQL_TIMEOUT_MS || '8000', 10);
+const REST_TIMEOUT_MS = parseInt(process.env.GITHUB_REST_TIMEOUT_MS || '5000', 10);
 const ORG_MEMBER_LIMIT = 100;
 
 let currentTokenIndex = 0;
