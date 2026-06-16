@@ -2655,3 +2655,53 @@ describe('getWrappedData weekendRatio', () => {
     expect(result.weekendRatio).toBe(0);
   });
 });
+
+describe('GitHub API Timeout Configuration', () => {
+  it('uses default GraphQL timeout of 8000ms when GITHUB_GRAPHQL_TIMEOUT_MS is not set', () => {
+    const original = process.env.GITHUB_GRAPHQL_TIMEOUT_MS;
+    delete process.env.GITHUB_GRAPHQL_TIMEOUT_MS;
+
+    const timeoutMs = parseInt(process.env.GITHUB_GRAPHQL_TIMEOUT_MS || '8000', 10);
+    expect(timeoutMs).toBe(8000);
+
+    if (original !== undefined) process.env.GITHUB_GRAPHQL_TIMEOUT_MS = original;
+  });
+
+  it('uses default REST timeout of 5000ms when GITHUB_REST_TIMEOUT_MS is not set', () => {
+    const original = process.env.GITHUB_REST_TIMEOUT_MS;
+    delete process.env.GITHUB_REST_TIMEOUT_MS;
+
+    const timeoutMs = parseInt(process.env.GITHUB_REST_TIMEOUT_MS || '5000', 10);
+    expect(timeoutMs).toBe(5000);
+
+    if (original !== undefined) process.env.GITHUB_REST_TIMEOUT_MS = original;
+  });
+
+  it('respects custom GraphQL timeout when GITHUB_GRAPHQL_TIMEOUT_MS is set', () => {
+    const original = process.env.GITHUB_GRAPHQL_TIMEOUT_MS;
+    process.env.GITHUB_GRAPHQL_TIMEOUT_MS = '10000';
+
+    const timeoutMs = parseInt(process.env.GITHUB_GRAPHQL_TIMEOUT_MS || '8000', 10);
+    expect(timeoutMs).toBe(10000);
+
+    if (original !== undefined) {
+      process.env.GITHUB_GRAPHQL_TIMEOUT_MS = original;
+    } else {
+      delete process.env.GITHUB_GRAPHQL_TIMEOUT_MS;
+    }
+  });
+
+  it('respects custom REST timeout when GITHUB_REST_TIMEOUT_MS is set', () => {
+    const original = process.env.GITHUB_REST_TIMEOUT_MS;
+    process.env.GITHUB_REST_TIMEOUT_MS = '3000';
+
+    const timeoutMs = parseInt(process.env.GITHUB_REST_TIMEOUT_MS || '5000', 10);
+    expect(timeoutMs).toBe(3000);
+
+    if (original !== undefined) {
+      process.env.GITHUB_REST_TIMEOUT_MS = original;
+    } else {
+      delete process.env.GITHUB_REST_TIMEOUT_MS;
+    }
+  });
+});
